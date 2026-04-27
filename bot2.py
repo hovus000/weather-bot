@@ -1,16 +1,22 @@
+import os
 import telebot
 from pyowm import OWM
-from apscheduler.schedulers.background import BackgroundScheduler
 from pyowm.utils.config import get_default_config
 
+# Настройки OWM
 config_dict = get_default_config()
-config_dict['language'] = 'ru'  
+config_dict['language'] = 'ru'
 
-owm = OWM('U_Token', config_dict)
+# Получаем ключи из настроек Render (Environment Variables)
+TOKEN = os.environ.get('TOKEN_BOT')
+OWM_KEY = os.environ.get('API_OWM')
+CHAT_ID = os.environ.get('MY_CHAT_ID')
+
+# Инициализация
+owm = OWM(OWM_KEY, config_dict)
 mgr = owm.weather_manager()
+bot = telebot.TeleBot(TOKEN)
 
-bot = telebot.TeleBot('U_Token')
-chat_id = 762821020
 
 weather_translations = {
     "Clouds": "облачно ☁️",
@@ -99,7 +105,7 @@ def cheak_wether_monitoring():
             status = w.status
             
             wether_desc = weather_translations.get(status, status)
-            bot.send_message(chat_id, f"🕒 Мониторинг: \n\nВ городе {city} сейчас {wether_desc}, температура {round(temp)}°C")
+            bot.send_message(CHAT_ID, f"🕒 Мониторинг: \n\nВ городе {city} сейчас {wether_desc}, температура {round(temp)}°C")
         except:
             continue
 
